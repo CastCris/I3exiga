@@ -1,4 +1,4 @@
-# Bexiga
+# I3exiga
 > I3exiaga IFSP é uma plataforma online que oferece a toda comunidade interna e externa do IFSP a oportunidade de aprender e praticar exercícios computacionais de forma simples e acessível com uma filosofia de livre circulação e disseminação do conhecimento
 
 > **Esse é um sistema esperimental para a disciplina _Laboratório de Programação 2_ lecionado pelo docente _Dr. Domingos Bernados_ no curso _Técnico em Desenvolvimento de Sistema na forma Integrada ao Ensino Médio_**
@@ -12,7 +12,7 @@ O ambiente foi projetado para ambientes debian semelhantes ao utilizados na inst
 
 Após isso, insira a seguinte url no seu navegador de preferência:
 
-http://localhost:8080/Bexiga
+http://localhost:8080/I3exiga
 
 E... pronto! A aplicação estará rodando perfeitamente em seu computador pessoal local.
 
