@@ -6,14 +6,17 @@
 ## FICHA TÉCNICA
 ### Execução
 O ambiente foi projetado para ambientes debian semelhantes ao utilizados na instituição. Para inicializar o sistema, não é necessário o uso de IDES ou programas externo, somente este repositório clonado em sua máquina local. Em seu ambiente linux _Debian_, execute o seguinte comando:
+```bash
 ./bin/startup.sh
+```
 
 Após isso, insira a seguinte url no seu navegador de preferência:
+
 http://localhost:8080/Bexiga
 
 E... pronto! A aplicação estará rodando perfeitamente em seu computador pessoal local.
 
-### Entidades
+### Entidades(Colocar os coisos depois aqui garai)
 - ProblemasComputacionais
 - User
 - Article
