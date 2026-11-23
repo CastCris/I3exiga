@@ -1,0 +1,73 @@
+% Modelo de artigo do I3exiga IFSP.
+% Compile com: pdflatex modelo-artigo.tex
+% Preencha os campos em "Dados do artigo" e escreva o texto nas seções abaixo.
+% Artigos de SOLUÇÃO devem informar o link do problema; artigos de CONHECIMENTO GERAL
+% não podem resolver problemas da plataforma. Códigos devem estar em C, C++, Java ou Python.
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny,
+  showstringspaces=false
+}
+
+% ===================== Dados do artigo =====================
+\newcommand{\tipoartigo}{Conhecimento geral} % ou: Solução de problema
+\newcommand{\titulo}{Título do artigo}
+\newcommand{\autores}{Nome do(a) autor(a) 1 \and Nome do(a) autor(a) 2}
+\newcommand{\linkproblema}{} % apenas para artigos de solução, ex.: https://exemplo.ifsp.edu.br/problems/view?id=1
+% ===========================================================
+
+\title{\titulo}
+\author{\autores}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+  \textbf{Tipo:} \tipoartigo \\
+  \ifx\linkproblema\empty\else \textbf{Problema:} \url{\linkproblema} \fi
+\end{center}
+
+\begin{abstract}
+Resumo do artigo em poucas linhas.
+\end{abstract}
+
+\section{Introdução}
+Apresente o tema e o objetivo do artigo.
+
+\section{Desenvolvimento}
+Explique o conteúdo. Em artigos de solução, descreva a lógica de cada solução de forma explícita
+antes de apresentar o código.
+
+\begin{lstlisting}[language=C, caption={Exemplo de código em C}]
+#include <stdio.h>
+
+int main(void) {
+    int a, b;
+    scanf("%d %d", &a, &b);
+    printf("%d\n", a + b);
+    return 0;
+}
+\end{lstlisting}
+
+\section{Conclusão}
+Encerre com os principais pontos.
+
+\begin{thebibliography}{9}
+\bibitem{ref1} Sobrenome, N. \textit{Título da obra}. Editora, ano.
+\end{thebibliography}
+
+\end{document}

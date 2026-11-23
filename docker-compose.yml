@@ -1,0 +1,30 @@
+services:
+  i3exiga:
+    build:
+      context: .
+    image: i3exiga:latest
+    container_name: i3exiga
+    restart: unless-stopped
+    ports:
+      - "${I3EXIGA_PORT:-8080}:8080"
+    environment:
+      # Administrador criado na primeira execução. Se a senha ficar vazia, uma senha aleatória
+      # é gerada e escrita no log (docker compose logs i3exiga).
+      I3EXIGA_ADMIN_USER: ${I3EXIGA_ADMIN_USER:-admin}
+      I3EXIGA_ADMIN_PASSWORD: ${I3EXIGA_ADMIN_PASSWORD:-}
+      I3EXIGA_TIMEZONE: ${I3EXIGA_TIMEZONE:-America/Sao_Paulo}
+      # Insere problemas e artigos de demonstração na primeira execução (use false para começar vazio).
+      I3EXIGA_SEED_DEMO: ${I3EXIGA_SEED_DEMO:-true}
+    volumes:
+      - i3exiga-data:/data          # banco de dados e PDFs dos artigos
+    # Endurecimento: o código dos usuários roda neste contêiner, então damos apenas as
+    # capacidades necessárias (trocar para o usuário "judge", encerrar processos e gerir arquivos).
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, KILL, SETGID, SETUID]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 2g
+    pids_limit: 1024
+
+volumes:
+  i3exiga-data:

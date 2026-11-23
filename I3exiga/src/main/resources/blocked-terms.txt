@@ -1,0 +1,13 @@
+# Termos bloqueados automaticamente nos comentários (um por linha, sem acentuação obrigatória).
+# Edite livremente: a lista é lida na inicialização da aplicação.
+# As denúncias feitas pelos usuários continuam sendo o mecanismo principal de moderação.
+idiota
+imbecil
+babaca
+otario
+otária
+estupido
+estúpido
+merda
+porra
+caralho
