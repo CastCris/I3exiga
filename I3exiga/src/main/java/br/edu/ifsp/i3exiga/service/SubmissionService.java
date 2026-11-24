@@ -96,6 +96,37 @@ public final class SubmissionService implements AutoCloseable {
                 .filter(s -> s.getUserId() == userId).toList();
     }
 
+    /**
+     * Busca submissões de todos os usuários; os critérios informados se combinam (E). Mais recentes primeiro.
+     *
+     * @param problemIds problemas que o solicitante pode ver (restringe o resultado)
+     * @param problemId  problema específico ({@code null} = todos)
+     * @param user       trecho do prontuário ou do nome (vazio = todos)
+     * @param from       início do período, inclusive ({@code null} = sem limite)
+     * @param to         fim do período, exclusive ({@code null} = sem limite)
+     * @param verdict    tipo de resultado ({@code null} = todos)
+     * @param language   linguagem ({@code null} = todas)
+     */
+    public List<Submission> search(java.util.Set<Long> problemIds, Long problemId, String user, Instant from, Instant to,
+                                   Verdict verdict, Language language) {
+        String needle = br.edu.ifsp.i3exiga.util.Text.fold(user);
+        return store.data().submissions.values().stream()
+                .filter(s -> problemIds.contains(s.getProblemId()))
+                .filter(s -> problemId == null || s.getProblemId().equals(problemId))
+                .filter(s -> from == null || !s.getSubmittedAt().isBefore(from))
+                .filter(s -> to == null || s.getSubmittedAt().isBefore(to))
+                .filter(s -> verdict == null || s.getVerdict() == verdict)
+                .filter(s -> language == null || s.getLanguage() == language)
+                .filter(s -> needle.isEmpty() || matchesUser(s.getUserId(), needle))
+                .sorted(Comparator.comparing(Submission::getId).reversed()).toList();
+    }
+
+    private boolean matchesUser(Long userId, String needle) {
+        User user = store.data().users.get(userId);
+        return user != null && (br.edu.ifsp.i3exiga.util.Text.fold(user.getProntuario()).contains(needle)
+                || br.edu.ifsp.i3exiga.util.Text.fold(user.getDisplayName()).contains(needle));
+    }
+
     public boolean hasSolved(Long userId, Long problemId) {
         return store.data().submissions.values().stream().anyMatch(s -> s.getVerdict().isAccepted()
                 && s.getUserId().equals(userId) && s.getProblemId().equals(problemId));

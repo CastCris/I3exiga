@@ -31,15 +31,19 @@
     <v:if test="${not empty problems}">
         <div class="table-wrap">
         <table>
-            <thead><tr><th class="num">#</th><th>Título</th><th>Tópicos</th><th class="num">Pontos</th><th>Situação</th></tr></thead>
+            <thead><tr><th class="num">#</th><th>Título</th><th>Tópicos</th><th>Autores</th><th class="num">Pontos</th><th>Situação</th></tr></thead>
             <tbody>
             <v:each items="${problems}" var="p">
                 <tr>
                     <td class="num">${p.id}</td>
                     <td><a href="${ctx}/problems/view?id=${p.id}">${v:h(p.title)}</a></td>
                     <td><v:each items="${p.topics}" var="tp"><a class="tag" href="${ctx}/problems?topic=${v:enc(tp)}">${v:h(tp)}</a></v:each></td>
+                    <td><v:each items="${p.authorIds}" var="aid"><a href="${ctx}/users?id=${aid}">${v:h(usersById[aid].displayName)}</a>&nbsp; </v:each></td>
                     <td class="num">${p.points}</td>
-                    <td><v:if test="${v:contains(solved, p.id)}"><span class="badge ok">Resolvido</span></v:if></td>
+                    <td>
+                        <v:if test="${v:contains(solved, p.id)}"><span class="badge ok">Resolvido</span></v:if>
+                        <v:if test="${p.status.name() != 'APPROVED'}"><span class="badge ${p.status.cssClass}">${p.status.label}</span></v:if>
+                    </td>
                 </tr>
             </v:each>
             </tbody>

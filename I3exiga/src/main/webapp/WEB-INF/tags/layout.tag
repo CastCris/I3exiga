@@ -22,10 +22,11 @@
                 <a href="${ctx}/problems">Problemas</a>
                 <a href="${ctx}/scoreboards/general">Placar</a>
                 <a href="${ctx}/scoreboards">Placares</a>
+                <a href="${ctx}/submissions/all">Submissões</a>
             </v:if>
             <a href="${ctx}/articles">Artigos</a>
             <v:if test="${currentUser.admin}">
-                <a href="${ctx}/admin/articles">Avaliações</a>
+                <a href="${ctx}/admin/reviews">Votações</a>
                 <a href="${ctx}/admin/reports">Denúncias</a>
                 <a href="${ctx}/admin/users">Usuários</a>
             </v:if>

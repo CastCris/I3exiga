@@ -1,6 +1,7 @@
 package br.edu.ifsp.i3exiga.service;
 
 import br.edu.ifsp.i3exiga.model.Problem;
+import br.edu.ifsp.i3exiga.model.ReviewStatus;
 import br.edu.ifsp.i3exiga.model.Submission;
 import br.edu.ifsp.i3exiga.model.User;
 import br.edu.ifsp.i3exiga.store.Data;
@@ -100,7 +101,7 @@ public final class ScoreService {
             int total = 0;
             for (Long problemId : problemIds) {
                 Problem problem = data.problems.get(problemId);
-                if (problem != null && !data.unlocks.contains(Data.unlockKey(userId, problemId))) {
+                if (problem != null && problem.getStatus() == ReviewStatus.APPROVED && !data.unlocks.contains(Data.unlockKey(userId, problemId))) {
                     total += problem.getPoints();
                 }
             }

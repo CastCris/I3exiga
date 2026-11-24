@@ -35,5 +35,5 @@
     </v:if>
 
     <h2>Código enviado</h2>
-    <pre>${v:h(submission.sourceCode)}</pre>
+    <pre class="code-view" data-language="${submission.language}"><code>${v:h(submission.sourceCode)}</code></pre>
 </t:layout>

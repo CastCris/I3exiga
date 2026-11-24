@@ -30,7 +30,6 @@ public final class ArticleService {
     private static final long MAX_PDF_BYTES = 10L * 1024 * 1024;
     private static final byte[] PDF_MAGIC = "%PDF-".getBytes(StandardCharsets.US_ASCII);
     private static final int MAX_TITLE = 150;
-    private static final int MAX_FEEDBACK = 2000;
 
     private static final List<String> COMMON_CRITERIA = List.of(
             "Gramática correta",
@@ -43,11 +42,13 @@ public final class ArticleService {
     private final Store store;
     private final SubmissionService submissions;
     private final Path directory;
+    private final ReviewService reviews;
 
-    public ArticleService(Store store, SubmissionService submissions, Path directory) {
+    public ArticleService(Store store, SubmissionService submissions, Path directory, ReviewService reviews) {
         this.store = store;
         this.submissions = submissions;
         this.directory = directory;
+        this.reviews = reviews;
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -140,9 +141,10 @@ public final class ArticleService {
                 .sorted(Comparator.comparing(Article::getId).reversed()).toList();
     }
 
-    public List<Article> pendingReview() {
+    /** Artigos ainda não aprovados (em votação ou rejeitados). */
+    public List<Article> awaitingReview() {
         return store.data().articles.values().stream()
-                .filter(a -> a.getStatus() == ReviewStatus.PENDING)
+                .filter(a -> a.getStatus() != ReviewStatus.APPROVED)
                 .sorted(Comparator.comparing(Article::getId)).toList();
     }
 
@@ -203,6 +205,7 @@ public final class ArticleService {
             target.setTopics(new ArrayList<>(draft.getTopics()));
             target.setAuthorIds(authors.stream().map(User::getId).toList());
             target.setStatus(ReviewStatus.PENDING);
+            target.setVotes(new ArrayList<>()); // todo envio reinicia a votação dos administradores
             target.setFeedback(null);
             target.setReviewerId(null);
             target.setSubmittedAt(Instant.now());
@@ -214,24 +217,16 @@ public final class ArticleService {
         });
     }
 
-    /** Avaliação feita por um administrador com base nos critérios do tipo do artigo. */
-    public void review(User reviewer, long articleId, boolean approve, int confirmedCriteria, String feedback) {
+    /**
+     * Voto de um administrador. Para votar a favor ele confirma todos os critérios de avaliação do tipo do
+     * artigo; para votar contra precisa explicar o motivo.
+     */
+    public void vote(User admin, long articleId, boolean approve, int confirmedCriteria, String comment) {
         Article article = get(articleId);
-        String text = Text.trim(feedback);
-        if (text.length() > MAX_FEEDBACK) {
-            throw new ValidationException("O parecer deve ter no máximo " + MAX_FEEDBACK + " caracteres.");
-        }
         if (approve && confirmedCriteria < criteria().get(article.getType()).size()) {
-            throw new ValidationException("Para aprovar, confirme todos os critérios de avaliação.");
+            throw new ValidationException("Para votar a favor, confirme todos os critérios de avaliação.");
         }
-        if (!approve && text.isEmpty()) {
-            throw new ValidationException("Explique aos autores o motivo da rejeição.");
-        }
-        store.transaction(() -> {
-            article.setStatus(approve ? ReviewStatus.APPROVED : ReviewStatus.REJECTED);
-            article.setFeedback(text.isEmpty() ? null : text);
-            article.setReviewerId(reviewer.getId());
-        });
+        reviews.cast(admin, article, approve, comment);
     }
 
     /**

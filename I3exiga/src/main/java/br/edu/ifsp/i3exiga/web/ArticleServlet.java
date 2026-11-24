@@ -2,6 +2,7 @@ package br.edu.ifsp.i3exiga.web;
 
 import br.edu.ifsp.i3exiga.model.Article;
 import br.edu.ifsp.i3exiga.model.ArticleType;
+import br.edu.ifsp.i3exiga.model.Problem;
 import br.edu.ifsp.i3exiga.model.ReviewStatus;
 import br.edu.ifsp.i3exiga.model.User;
 import br.edu.ifsp.i3exiga.service.AccessDeniedException;
@@ -76,7 +77,7 @@ public class ArticleServlet extends BaseServlet {
         if (!param(request, "problemId").isBlank()) {
             User user = requireUser(request);
             long problemId = idParam(request, "problemId");
-            request.setAttribute("problem", services.problems.get(problemId));
+            request.setAttribute("problem", services.problems.getVisible(user, problemId));
             request.setAttribute("articles", services.articles.forProblem(user, problemId));
             render(request, response, "problem-articles");
             return;
@@ -110,7 +111,15 @@ public class ArticleServlet extends BaseServlet {
         request.setAttribute("canManage", viewer != null && services.articles.canManage(viewer, article));
         request.setAttribute("usersById", services.users.mapById());
         if (article.getProblemId() != null) {
-            request.setAttribute("problem", services.problems.get(article.getProblemId()));
+            Problem problem = services.problems.get(article.getProblemId());
+            if (services.problems.canView(viewer, problem)) {
+                request.setAttribute("problem", problem);
+            }
+        }
+        if (viewer != null && services.articles.canManage(viewer, article)) {
+            request.setAttribute("ballots", services.reviews.ballots(article));
+            request.setAttribute("criteria", services.articles.criteria().get(article.getType()));
+            request.setAttribute("canVote", viewer.isAdmin() && article.getStatus() != ReviewStatus.APPROVED);
         }
         render(request, response, "article");
     }
@@ -137,7 +146,7 @@ public class ArticleServlet extends BaseServlet {
         request.setAttribute("types", ArticleType.values());
         request.setAttribute("knownTopics", Stream.concat(services.problems.topics().stream(), services.articles.generalTopics().stream())
                 .distinct().sorted().toList());
-        request.setAttribute("problems", services.problems.all());
+        request.setAttribute("problems", services.problems.visibleTo(requireUser(request)));
         render(request, response, "article-form");
     }
 

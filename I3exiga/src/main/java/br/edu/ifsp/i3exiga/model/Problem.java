@@ -5,8 +5,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Problema de programação competitiva. */
-public class Problem implements Serializable {
+/** Problema de programação competitiva (entra no ar após a aprovação unânime dos administradores). */
+public class Problem implements Serializable, Votable {
 
     private static final long serialVersionUID = 1L;
 
@@ -21,6 +21,9 @@ public class Problem implements Serializable {
     private List<TestCase> testCases = new ArrayList<>();
     private List<String> topics = new ArrayList<>();
     private Long authorId;
+    private List<Long> authorIds = new ArrayList<>();
+    private ReviewStatus status;
+    private List<Vote> votes = new ArrayList<>();
     private Instant createdAt;
 
     public Problem() {
@@ -114,6 +117,30 @@ public class Problem implements Serializable {
         this.authorId = authorId;
     }
 
+    public List<Long> getAuthorIds() {
+        return authorIds;
+    }
+
+    public void setAuthorIds(List<Long> authorIds) {
+        this.authorIds = authorIds;
+    }
+
+    public ReviewStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ReviewStatus status) {
+        this.status = status;
+    }
+
+    public List<Vote> getVotes() {
+        return votes;
+    }
+
+    public void setVotes(List<Vote> votes) {
+        this.votes = votes;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }
@@ -122,10 +149,22 @@ public class Problem implements Serializable {
         this.createdAt = createdAt;
     }
 
-    /** Dados gravados antes da existência dos tópicos não têm esse campo. */
+    /** Dados gravados em versões anteriores não têm alguns campos; aqui eles são completados. */
     private Object readResolve() {
         if (topics == null) {
             topics = new ArrayList<>();
+        }
+        if (votes == null) {
+            votes = new ArrayList<>();
+        }
+        if (authorIds == null) {
+            authorIds = new ArrayList<>();
+            if (authorId != null) {
+                authorIds.add(authorId);
+            }
+        }
+        if (status == null) {
+            status = ReviewStatus.APPROVED; // problemas antigos já estavam publicados
         }
         return this;
     }

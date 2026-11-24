@@ -41,7 +41,7 @@ public abstract class BaseServlet extends HttpServlet {
         } catch (ValidationException e) {
             // Erro em uma ação sem formulário próprio: mostra a mensagem e volta para a página anterior.
             flashError(request, e.getMessage());
-            redirect(request, response, previousPage(request));
+            redirect(request, response, previousPage(request, "/problems"));
         }
     }
 
@@ -145,7 +145,7 @@ public abstract class BaseServlet extends HttpServlet {
     }
 
     /** Página de onde veio a requisição (cabeçalho Referer), aceita somente se for do mesmo servidor. */
-    private String previousPage(HttpServletRequest request) {
+    protected String previousPage(HttpServletRequest request, String fallback) {
         String referer = request.getHeader("Referer");
         try {
             URI uri = URI.create(referer);
@@ -157,7 +157,7 @@ public abstract class BaseServlet extends HttpServlet {
         } catch (IllegalArgumentException | NullPointerException e) {
             // Sem Referer válido: usa a página inicial.
         }
-        return "/problems";
+        return fallback;
     }
 
     private static void moveToRequest(HttpSession session, HttpServletRequest request, String name) {

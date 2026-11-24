@@ -16,13 +16,15 @@ public final class Services implements AutoCloseable {
     public final ScoreService scores;
     public final CommentService comments;
     public final ScoreboardService scoreboards;
+    public final ReviewService reviews;
 
     public Services(AppConfig config) {
         store = new Store(config.dataDir);
         users = new UserService(store);
         submissions = new SubmissionService(store, new Judge(new Sandbox(config)));
-        articles = new ArticleService(store, submissions, config.dataDir.resolve("articles"));
-        problems = new ProblemService(store, articles);
+        reviews = new ReviewService(store);
+        articles = new ArticleService(store, submissions, config.dataDir.resolve("articles"), reviews);
+        problems = new ProblemService(store, articles, reviews);
         scores = new ScoreService(store);
         comments = new CommentService(store, users);
         scoreboards = new ScoreboardService(store);

@@ -12,10 +12,6 @@
     <p><v:each items="${article.topics}" var="tp"><span class="tag">${v:h(tp)}</span></v:each></p>
     <v:if test="${canManage}">
         <p><span class="badge ${article.status.cssClass}">${article.status.label}</span></p>
-        <v:if test="${not empty article.feedback}">
-            <div class="notice warn"><strong>Parecer da avaliação:</strong>
-                <div class="text">${v:h(article.feedback)}</div></div>
-        </v:if>
     </v:if>
 
     <v:if test="${canView}">
@@ -47,5 +43,8 @@
                 <button type="submit" class="danger">Remover</button>
             </form>
         </div>
+    </v:if>
+    <v:if test="${canManage}">
+        <t:vote-panel kind="article" itemId="${article.id}" status="${article.status}" ballots="${ballots}" criteria="${criteria}" canVote="${canVote}"/>
     </v:if>
 </t:layout>

@@ -3,6 +3,8 @@
 <%@ taglib prefix="v" uri="i3exiga/view" %>
 <t:layout title="${empty problem.id ? 'Novo problema' : 'Editar problema'}">
     <h1>${empty problem.id ? 'Novo problema' : 'Editar problema'}</h1>
+    <p class="meta">Problemas novos só aparecem para os usuários depois que <strong>todos os administradores</strong> votarem a favor.
+        Se o problema ainda não foi aprovado, editá-lo reinicia a votação.</p>
     <form method="post" action="${ctx}/problems/save" class="stack">
         <t:csrf/>
         <v:if test="${not empty problem.id}"><input type="hidden" name="id" value="${problem.id}"></v:if>
@@ -11,6 +13,10 @@
         </label>
         <label>Enunciado
             <textarea name="statement" rows="10" required>${v:h(problem.statement)}</textarea>
+        </label>
+        <label>Autores (prontuários de docentes ou administradores)
+            <textarea name="authors" rows="2" required>${v:h(authors)}</textarea>
+            <span class="hint">Um por linha. Você deve permanecer na lista, a menos que seja administrador.</span>
         </label>
         <label>Tópicos
             <input name="topics" value="${v:h(v:join(problem.topics))}" maxlength="200" placeholder="grafos, programação dinâmica">
@@ -43,24 +49,17 @@
         </v:if>
 
         <h2>Casos de teste</h2>
-        <p class="hint">A correção para no primeiro caso que falhar. A saída esperada é obrigatória.</p>
-        <div id="tests">
-            <v:each items="${problem.testCases}" var="test">
-                <fieldset class="test-row">
-                    <legend>Caso de teste</legend>
-                    <div class="grid2">
-                        <label>Entrada
-                            <textarea class="code" name="testInput" rows="4">${v:h(test.input)}</textarea>
-                        </label>
-                        <label>Saída esperada
-                            <textarea class="code" name="testOutput" rows="4">${v:h(test.expectedOutput)}</textarea>
-                        </label>
-                    </div>
-                    <button type="button" class="link remove-test">Remover este caso</button>
-                </fieldset>
-            </v:each>
+        <p class="hint">Cada linha é um caso de teste: a linha N das entradas combina com a linha N das saídas. Para uma quebra de
+            linha dentro de uma entrada ou saída, escreva <code>\n</code> (exemplo: <code>5\n3 9 2 7 1</code>); para uma barra, <code>\\</code>.
+            A correção para no primeiro caso que falhar.</p>
+        <div class="grid2">
+            <label>Entradas (uma por linha)
+                <textarea class="code tests" name="testInputs" rows="10" wrap="off" data-sync="tests" required spellcheck="false">${v:h(testInputs)}</textarea>
+            </label>
+            <label>Saídas esperadas (uma por linha)
+                <textarea class="code tests" name="testOutputs" rows="10" wrap="off" data-sync="tests" required spellcheck="false">${v:h(testOutputs)}</textarea>
+            </label>
         </div>
-        <div><button type="button" id="add-test">Adicionar caso de teste</button></div>
 
         <div class="actions">
             <button type="submit" class="primary">Salvar problema</button>

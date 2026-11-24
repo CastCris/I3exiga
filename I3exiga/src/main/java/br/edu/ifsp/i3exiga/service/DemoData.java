@@ -157,7 +157,10 @@ public final class DemoData {
                     O número de componentes conexos.""", "5 3\n1 2\n2 3\n4 5\n", "2\n",
                     "5 3\n1 2\n2 3\n4 5\n", "2\n", "4 0\n", "4\n", "3 3\n1 2\n2 3\n1 3\n", "1\n",
                     "6 4\n1 2\n3 4\n5 6\n2 3\n", "2\n", "1 0\n", "1\n"));
-        problems.forEach(problem -> services.problems.save(problem, admin));
+        for (Problem problem : problems) {
+            Problem saved = services.problems.save(problem, List.of(admin), admin);
+            services.problems.vote(admin, saved.getId(), true, ""); // com um só administrador, aprova na hora
+        }
     }
 
     private static void seedArticles(Services services, User admin, Problem fibonacci, Problem components) {
@@ -280,7 +283,7 @@ public final class DemoData {
         Article saved = services.articles.save(draft, List.of(admin), admin, pdf);
         if (approve) {
             int criteria = services.articles.criteria().get(type).size();
-            services.articles.review(admin, saved.getId(), true, criteria, "");
+            services.articles.vote(admin, saved.getId(), true, criteria, "");
         }
     }
 

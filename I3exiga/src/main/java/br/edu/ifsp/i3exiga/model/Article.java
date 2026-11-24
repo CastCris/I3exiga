@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Artigo em PDF de conhecimento geral ou de solução de um problema. */
-public class Article implements Serializable {
+public class Article implements Serializable, Votable {
 
     private static final long serialVersionUID = 1L;
 
@@ -20,6 +20,7 @@ public class Article implements Serializable {
     private Long reviewerId;
     private Instant submittedAt;
     private List<String> topics = new ArrayList<>();
+    private List<Vote> votes = new ArrayList<>();
 
     public Article() {
     }
@@ -104,10 +105,24 @@ public class Article implements Serializable {
         this.topics = topics;
     }
 
-    /** Dados gravados antes da existência dos tópicos não têm esse campo. */
+    public List<Vote> getVotes() {
+        return votes;
+    }
+
+    public void setVotes(List<Vote> votes) {
+        this.votes = votes;
+    }
+
+    /** Dados gravados em versões anteriores não têm alguns campos; aqui eles são completados. */
     private Object readResolve() {
         if (topics == null) {
             topics = new ArrayList<>();
+        }
+        if (votes == null) {
+            votes = new ArrayList<>();
+            if (reviewerId != null && status != ReviewStatus.PENDING) {
+                votes.add(new Vote(reviewerId, status == ReviewStatus.APPROVED, feedback, submittedAt));
+            }
         }
         return this;
     }
